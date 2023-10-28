@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace K3SalesOutNoticeReportTool
+namespace ExcelDataDisposeTool
 {
     public partial class Load : Form
     {

@@ -1,4 +1,4 @@
-﻿namespace K3SalesOutNoticeReportTool
+﻿namespace ExcelDataDisposeTool
 {
     partial class Load
     {
