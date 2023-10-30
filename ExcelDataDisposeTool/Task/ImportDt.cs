@@ -39,57 +39,65 @@ namespace ExcelDataDisposeTool.Task
             //获取动态生成绑定字段临时表
             var dt = tempDtList.ExportData();
 
-            using (var fsRead = File.OpenRead(fileAddress))
+            try
             {
-                wk = new XSSFWorkbook(fsRead);
-                //获取第一个sheet
-                var sheet = wk.GetSheetAt(0);
-                //定义列数(注:此总列次必须与EXCEL中的总列数一致)
-                var colnum = dt.Columns.Count;
-
-                //创建完标题后,开始从第二行起读取对应列的值(因为EXCEL模板前一行都是标题信息,从第二行开始才是内容)
-                for (var r = 1; r <= sheet.LastRowNum; r++)
+                using (var fsRead = File.OpenRead(fileAddress))
                 {
-                    var result = false;
-                    var dr = dt.NewRow();
-                    var row = sheet.GetRow(r);
-                    if (row == null) continue;
+                    wk = new XSSFWorkbook(fsRead);
+                    //获取第二个sheet
+                    var sheet = wk.GetSheetAt(1);
+                    //定义列数(注:此总列次必须与EXCEL中的总列数一致)
+                    var colnum = dt.Columns.Count;
 
-                    //循环读取EXCEL中各行的单元格
-                    for (var j = 0; j < colnum; j++)
+                    //创建完标题后,开始从第二行起读取对应列的值(因为EXCEL模板前一行都是标题信息,从第二行开始才是内容)
+                    for (var r = 1; r <= sheet.LastRowNum; r++)
                     {
-                        var cell = row.GetCell(j);
-                        var cellValue = GetCellValue(cell);
+                        var result = false;
+                        var dr = dt.NewRow();
+                        var row = sheet.GetRow(r);
+                        if (row == null) continue;
 
-                        //判断cellValue在dt内存在,不进行插入 （作用:排除相同的记录）
-                        //if (dt.Select("客户编码='" + cellValue + "'").Length > 0 /*|| dt.Select("客户名称='"+cellValue+"'").Length>0*/)
-                        //{
-                        //    continue;
-                        //}
+                        //循环读取EXCEL中各行的单元格
+                        for (var j = 0; j < colnum; j++)
+                        {
+                            var cell = row.GetCell(j);
+                            var cellValue = GetCellValue(cell);
 
-                        //当为空的就不获取
-                        if (cellValue == string.Empty)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            dr[j] = cellValue;
-                        }
+                            //判断cellValue在dt内存在,不进行插入 （作用:排除相同的记录）
+                            //if (dt.Select("客户编码='" + cellValue + "'").Length > 0 /*|| dt.Select("客户名称='"+cellValue+"'").Length>0*/)
+                            //{
+                            //    continue;
+                            //}
 
-                        //全为空的就不取
-                        if (dr[j].ToString() != "")
-                        {
-                            result = true;
+                            //当为空的就不获取
+                            if (cellValue == string.Empty)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                dr[j] = cellValue;
+                            }
+
+                            //全为空的就不取
+                            if (dr[j].ToString() != "")
+                            {
+                                result = true;
+                            }
                         }
-                    }
-                    if (result)
-                    {
-                        //将每行增加至Dt结果集内
-                        dt.Rows.Add(dr);
+                        if (result)
+                        {
+                            //将每行增加至Dt结果集内
+                            dt.Rows.Add(dr);
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                var a1 = ex.Message;
+            }
+
             return dt;
         }
 
